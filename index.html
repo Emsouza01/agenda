@@ -58,6 +58,15 @@
     </div>
 
     <script>
+        const servicos = [
+            { nome: "Corte de Cabelo", preco: 50.00, descricao: "Corte de cabelo feminino e masculino, diversos estilos.", imagem: "https://images.unsplash.com/photo-1591058190075-5897159c4719?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+            { nome: "Manicure", preco: 30.00, descricao: "Manicure completa com esmaltação.", imagem: "https://images.unsplash.com/photo-1592011117507-74159594f5e5?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+            { nome: "Pedicure", preco: 40.00, descricao: "Pedicure completa com esmaltação.", imagem: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+            { nome: "Tintura", preco: 80.00, descricao: "Tintura capilar, todas as cores.", imagem: "https://images.unsplash.com/photo-1586453682715-477965eb8990?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+            { nome: "Escova", preco: 45.00, descricao: "Escova modeladora.", imagem: "https://plus.unsplash.com/premium_photo-1666345753843-177418949511?q=80&w=2024&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+            { nome: "Maquiagem", preco: 60.00, descricao: "Maquiagem para eventos.", imagem: "https://images.unsplash.com/photo-1591471466052-79a5584579bb?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+        ];
+
         const servicosContainer = document.getElementById("servicos");
         const modalAgendamento = document.getElementById("modal-agendamento");
         const modalCancelar = document.getElementById("modal-cancelar");
@@ -73,42 +82,8 @@
         let servicoSelecionado = null;
         let modoAdmin = false;
 
-        // Substitua esta URL pela URL da sua planilha publicada
-        const SHEET_URL = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/gviz/tq?tqx=out:csv&sheet=Servicos";
-
-        function carregarServicos() {
-            fetch(SHEET_URL)
-                .then(response => response.text())
-                .then(data => {
-                    const servicos = parseCSV(data);
-                    mostrarServicos(servicos);
-                })
-                .catch(error => {
-                    console.error("Erro ao carregar serviços:", error);
-                    servicosContainer.innerHTML = "<p class='text-red-500'>Erro ao carregar serviços. Por favor, tente novamente mais tarde.</p>";
-                });
-        }
-
-        function parseCSV(csvText) {
-            const linhas = csvText.trim().split("\n");
-            const cabecalho = linhas[0].split(",");
-            const servicos = [];
-
-            for (let i = 1; i < linhas.length; i++) {
-                const valores = linhas[i].split(",");
-                const servico = {};
-                for (let j = 0; j < cabecalho.length; j++) {
-                    const chave = cabecalho[j].trim();
-                    const valor = valores[j] ? valores[j].trim() : ""; // Verifica se o valor existe
-                    servico[chave] = valor;
-                }
-                servicos.push(servico);
-            }
-            return servicos;
-        }
-
-        function mostrarServicos(servicos) {
-            servicosContainer.innerHTML = "";
+        function mostrarServicos() {
+            servicosContainer.innerHTML = ""; // Limpa o container
 
             servicos.forEach(servico => {
                 const servicoCard = document.createElement("div");
@@ -118,7 +93,7 @@
                     <img src="${servico.imagem}" alt="${servico.nome}" class="mb-4">
                     <h2 class="text-xl font-semibold text-gray-800 mb-2">${servico.nome}</h2>
                     <p class="text-gray-600 mb-2">${servico.descricao}</p>
-                    <p class="text-lg font-bold text-pink-500 mb-4">R$ ${parseFloat(servico.preco).toFixed(2)}</p>
+                    <p class="text-lg font-bold text-pink-500 mb-4">R$ ${servico.preco.toFixed(2)}</p>
                     <button class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline agendar-btn"
                             data-nome="${servico.nome}" data-preco="${servico.preco}">
                         Agendar
@@ -138,7 +113,7 @@
         function mostrarModalAgendamento() {
             modalBody.innerHTML = `
                 <p class="text-gray-700 mb-4">Serviço Selecionado: <span class="font-semibold text-pink-500">${servicoSelecionado.nome}</span></p>
-                <p class="text-gray-700 mb-4">Preço: <span class="font-semibold text-pink-500">R$ ${parseFloat(servicoSelecionado.preco).toFixed(2)}</span></p>
+                <p class="text-gray-700 mb-4">Preço: <span class="font-semibold text-pink-500">R$ ${servicoSelecionado.preco.toFixed(2)}</span></p>
                 <div class="mb-4">
                     <label for="profissional" class="block text-gray-700 text-sm font-bold mb-2">Profissional:</label>
                     <select id="profissional" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
@@ -233,7 +208,7 @@
         adminSairButton.addEventListener("click", (event) => {
             event.preventDefault();
             esconderAdminArea();
-            carregarServicos(); // Garante que a lista de serviços seja exibida ao sair do modo admin
+            mostrarServicos(); // Garante que a lista de serviços seja exibida ao sair do modo admin
         });
 
         // Adiciona um botão de "Entrar como Administrador" no canto superior direito
@@ -243,9 +218,9 @@
         adminLoginButton.addEventListener("click", mostrarAdminArea);
         document.body.appendChild(adminLoginButton);
 
-        carregarServicos(); // Carrega os serviços do Google Sheets ao carregar a página
-
+        mostrarServicos();
     </script>
 </body>
 </html>
+
 
