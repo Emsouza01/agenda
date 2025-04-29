@@ -1,1 +1,251 @@
-"Helo world"
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salão de Beleza - Agendamento</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .servico-card img {
+            height: 200px;
+            object-fit: cover;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-pink-500 text-white py-4 text-center rounded-b-md shadow-md">
+        <h1 class="text-2xl font-semibold">Agende seu Serviço</h1>
+        <p class="text-lg">Encontre o serviço perfeito para você</p>
+    </header>
+
+    <main class="container mx-auto mt-6 p-4">
+        <section id="servicos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            </section>
+    </main>
+
+    <div id="modal-agendamento" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 hidden">
+        <div class="modal-content relative top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Agendar Serviço</h2>
+            <div id="modal-body">
+                </div>
+            <div class="modal-footer mt-6 flex justify-end">
+                <button id="modal-cancelar" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md mr-2 focus:outline-none focus:shadow-outline">
+                    Cancelar
+                </button>
+                <button id="modal-confirmar" class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline">
+                    Confirmar Agendamento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-area" class="fixed top-4 right-4 bg-white rounded-md shadow-md p-4 hidden">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Área Administrativa</h2>
+        <ul class="space-y-2">
+            <li><a href="#" id="admin-servicos" class="block text-blue-500 hover:text-blue-700">Serviços</a></li>
+            <li><a href="#" id="admin-profissionais" class="block text-blue-500 hover:text-blue-700">Profissionais</a></li>
+            <li><a href="#" id="admin-agendamentos" class="block text-blue-500 hover:text-blue-700">Agendamentos</a></li>
+            <li><a href="#" id="admin-horarios" class="block text-blue-500 hover:text-blue-700">Horários</a></li>
+        </ul>
+        <button id="admin-sair" class="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline">
+            Sair
+        </button>
+    </div>
+
+    <script>
+        const servicosContainer = document.getElementById("servicos");
+        const modalAgendamento = document.getElementById("modal-agendamento");
+        const modalCancelar = document.getElementById("modal-cancelar");
+        const modalConfirmar = document.getElementById("modal-confirmar");
+        const modalBody = document.getElementById("modal-body");
+        const adminArea = document.getElementById("admin-area");
+        const adminServicosLink = document.getElementById("admin-servicos");
+        const adminProfissionaisLink = document.getElementById("admin-profissionais");
+        const adminAgendamentosLink = document.getElementById("admin-agendamentos");
+        const adminHorariosLink = document.getElementById("admin-horarios");
+        const adminSairButton = document.getElementById("admin-sair");
+
+        let servicoSelecionado = null;
+        let modoAdmin = false;
+
+        // Substitua esta URL pela URL da sua planilha publicada
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/gviz/tq?tqx=out:csv&sheet=Servicos";
+
+        function carregarServicos() {
+            fetch(SHEET_URL)
+                .then(response => response.text())
+                .then(data => {
+                    const servicos = parseCSV(data);
+                    mostrarServicos(servicos);
+                })
+                .catch(error => {
+                    console.error("Erro ao carregar serviços:", error);
+                    servicosContainer.innerHTML = "<p class='text-red-500'>Erro ao carregar serviços. Por favor, tente novamente mais tarde.</p>";
+                });
+        }
+
+        function parseCSV(csvText) {
+            const linhas = csvText.trim().split("\n");
+            const cabecalho = linhas[0].split(",");
+            const servicos = [];
+
+            for (let i = 1; i < linhas.length; i++) {
+                const valores = linhas[i].split(",");
+                const servico = {};
+                for (let j = 0; j < cabecalho.length; j++) {
+                    const chave = cabecalho[j].trim();
+                    const valor = valores[j] ? valores[j].trim() : ""; // Verifica se o valor existe
+                    servico[chave] = valor;
+                }
+                servicos.push(servico);
+            }
+            return servicos;
+        }
+
+        function mostrarServicos(servicos) {
+            servicosContainer.innerHTML = "";
+
+            servicos.forEach(servico => {
+                const servicoCard = document.createElement("div");
+                servicoCard.className = "bg-white rounded-lg shadow-md p-4 flex flex-col justify-between servico-card";
+
+                servicoCard.innerHTML = `
+                    <img src="${servico.imagem}" alt="${servico.nome}" class="mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">${servico.nome}</h2>
+                    <p class="text-gray-600 mb-2">${servico.descricao}</p>
+                    <p class="text-lg font-bold text-pink-500 mb-4">R$ ${parseFloat(servico.preco).toFixed(2)}</p>
+                    <button class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline agendar-btn"
+                            data-nome="${servico.nome}" data-preco="${servico.preco}">
+                        Agendar
+                    </button>
+                `;
+
+                const agendarBtn = servicoCard.querySelector(".agendar-btn");
+                agendarBtn.addEventListener("click", () => {
+                    servicoSelecionado = servico;
+                    mostrarModalAgendamento();
+                });
+
+                servicosContainer.appendChild(servicoCard);
+            });
+        }
+
+        function mostrarModalAgendamento() {
+            modalBody.innerHTML = `
+                <p class="text-gray-700 mb-4">Serviço Selecionado: <span class="font-semibold text-pink-500">${servicoSelecionado.nome}</span></p>
+                <p class="text-gray-700 mb-4">Preço: <span class="font-semibold text-pink-500">R$ ${parseFloat(servicoSelecionado.preco).toFixed(2)}</span></p>
+                <div class="mb-4">
+                    <label for="profissional" class="block text-gray-700 text-sm font-bold mb-2">Profissional:</label>
+                    <select id="profissional" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="1">Ana</option>
+                        <option value="2">Maria</option>
+                        <option value="3">Carla</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="data" class="block text-gray-700 text-sm font-bold mb-2">Data:</label>
+                    <input type="date" id="data" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label for="hora" class="block text-gray-700 text-sm font-bold mb-2">Hora:</label>
+                    <select id="hora" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="08:00">08:00</option>
+                        <option value="09:00">09:00</option>
+                        <option value="10:00">10:00</option>
+                        <option value="11:00">11:00</option>
+                        <option value="14:00">14:00</option>
+                        <option value="15:00">15:00</option>
+                        <option value="16:00">16:00</option>
+                        <option value="17:00">17:00</option>
+                    </select>
+                </div>
+            `;
+            modalAgendamento.classList.remove("hidden");
+        }
+
+        function esconderModalAgendamento() {
+            modalAgendamento.classList.add("hidden");
+            servicoSelecionado = null;
+        }
+
+        modalCancelar.addEventListener("click", esconderModalAgendamento);
+        modalConfirmar.addEventListener("click", () => {
+            const profissionalId = document.getElementById("profissional").value;
+            const data = document.getElementById("data").value;
+            const hora = document.getElementById("hora").value;
+
+            if (!data || !hora) {
+                alert("Por favor, selecione a data e hora do agendamento.");
+                return;
+            }
+
+            // Aqui você pode adicionar a lógica para enviar os dados do agendamento para o servidor
+            console.log("Agendamento Confirmado:", {
+                servico: servicoSelecionado.nome,
+                profissionalId: profissionalId,
+                data: data,
+                hora: hora
+            });
+
+            alert(`Agendamento para ${servicoSelecionado.nome} confirmado para o dia ${data} às ${hora} com o profissional de ID ${profissionalId}.`);
+            esconderModalAgendamento();
+        });
+
+        function mostrarAdminArea() {
+            adminArea.classList.remove("hidden");
+            modoAdmin = true;
+        }
+
+        function esconderAdminArea() {
+            adminArea.classList.add("hidden");
+            modoAdmin = false;
+        }
+
+        adminServicosLink.addEventListener("click", (event) => {
+            event.preventDefault();
+            // Aqui você pode adicionar a lógica para gerenciar os serviços (criar, editar, excluir)
+            console.log("Gerenciar Serviços");
+        });
+
+        adminProfissionaisLink.addEventListener("click", (event) => {
+            event.preventDefault();
+            // Aqui você pode adicionar a lógica para gerenciar os profissionais (criar, editar, excluir)
+            console.log("Gerenciar Profissionais");
+        });
+
+        adminAgendamentosLink.addEventListener("click", (event) => {
+            event.preventDefault();
+            // Aqui você pode adicionar a lógica para gerenciar os agendamentos (visualizar, confirmar, cancelar)
+            console.log("Gerenciar Agendamentos");
+        });
+
+        adminHorariosLink.addEventListener("click", (event) => {
+            event.preventDefault();
+            // Aqui você pode adicionar a lógica para gerenciar os horários dos profissionais
+            console.log("Gerenciar Horários");
+        });
+
+        adminSairButton.addEventListener("click", (event) => {
+            event.preventDefault();
+            esconderAdminArea();
+            carregarServicos(); // Garante que a lista de serviços seja exibida ao sair do modo admin
+        });
+
+        // Adiciona um botão de "Entrar como Administrador" no canto superior direito
+        const adminLoginButton = document.createElement("button");
+        adminLoginButton.textContent = "Admin";
+        adminLoginButton.className = "absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline";
+        adminLoginButton.addEventListener("click", mostrarAdminArea);
+        document.body.appendChild(adminLoginButton);
+
+        carregarServicos(); // Carrega os serviços do Google Sheets ao carregar a página
+
+    </script>
+</body>
+</html>
+
