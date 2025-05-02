@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beauty Salon Booking</title>
+    <style>
+        :root {
+            --primary: #e91e63;
+            --secondary: #9c27b0;
+            --light: #f8f9fa;
+            --dark: #212121;
+            --accent: #ff4081;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--light), var(--primary));
+            min-height: 100vh;
+            color: var(--dark);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            padding: 2rem;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(10px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        h1, h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .services-grid, .professionals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .card.selected {
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 0 4px rgba(233, 30, 99, 0.2);
+        }
+
+        .card img {
+            width: 100%;
+            border-radius: 10px;
+            height: 150px;
+            object-fit: cover;
+            margin-bottom: 1rem;
+        }
+
+        .service-name {
+            font-weight: bold;
+            margin: 0.5rem 0;
+            text-align: center;
+        }
+
+        .price {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .schedule-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .day-slot, .time-slot {
+            padding: 0.5rem;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .day-slot.selected, .time-slot.selected {
+            background: var(--primary);
+            color: white;
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+        }
+
+        .confirmation {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .step-indicator {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+        }
+
+        @media (max-width: 768px) {
+            .schedule-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="step-indicator" id="stepIndicator">Step 1 of 3: Select Service</div>
+        
+        <div class="step active" id="step1">
+            <h1>Our Services</h1>
+            <div class="services-grid" id="servicesGrid"></div>
+            <div class="nav-buttons">
+                <button class="btn" onclick="nextStep()">Next</button>
+            </div>
+        </div>
+
+        <div class="step" id="step2">
+            <h1>Select Professional</h1>
+            <div class="professionals-grid" id="professionalsGrid"></div>
+            <div class="nav-buttons">
+                <button class="btn" onclick="prevStep()">Back</button>
+                <button class="btn" onclick="nextStep()">Next</button>
+            </div>
+        </div>
+
+        <div class="step" id="step3">
+            <h1>Schedule Appointment</h1>
+            <div class="schedule-container" id="scheduleDays"></div>
+            <div class="time-grid" id="scheduleTimes"></div>
+            <div class="nav-buttons">
+                <button class="btn" onclick="prevStep()">Back</button>
+                <button class="btn" onclick="confirmAppointment()">Confirm</button>
+            </div>
+        </div>
+
+        <div class="step" id="confirmation">
+            <div class="confirmation">
+                <h1>Appointment Confirmed!</h1>
+                <p id="confirmationDetails"></p>
+                <button class="btn" onclick="resetApp()">Book Another</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const services = [
+            {id: 1, name: 'Haircut', price: '$45', duration: '45min'},
+            {id: 2, name: 'Manicure', price: '$30', duration: '30min'},
+            {id: 3, name: 'Facial', price: '$75', duration: '60min'},
+            {id: 4, name: 'Massage', price: '$90', duration: '60min'},
+            {id: 5, name: 'Makeup', price: '$60', duration: '45min'},
+            {id: 6, name: 'Waxing', price: '$25', duration: '30min'}
+        ];
+
+        const professionals = [
+            {id: 1, name: 'Sarah', specialty: 'Hair & Makeup', image: 'https://images.unsplash.com/photo-1531434732625-2b531c26dd7d'},
+            {id: 2, name: 'Maria', specialty: 'Skincare', image: 'https://images.unsplash.com/photo-1559087040-2f3ba8be27bb'},
+            {id: 3, name: 'Lina', specialty: 'Nails', image: 'https://images.unsplash.com/photo-1586023492123-289e9c2265a3'},
+            {id: 4, name: 'Elena', specialty: 'Massage', image: 'https://images.unsplash.com/photo-1591229017515-0b732ca8c575'}
+        ];
+
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const times = ['9:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
+
+        let currentStep = 1;
+        let selectedService = null;
+        let selectedProfessional = null;
+        let selectedDay = null;
+        let selectedTime = null;
+
+        // Initialize app
+        function init() {
+            renderServices();
+            renderProfessionals();
+            renderDays();
+            showStep(1);
+        }
+
+        // Render services grid
+        function renderServices() {
+            const container = document.getElementById('servicesGrid');
+            services.forEach(service => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="service-name">${service.name}</div>
+                    <div class="price">${service.price}</div>
+                `;
+                card.addEventListener('click', () => selectService(service.id));
+                container.appendChild(card);
+            });
+        }
+
+        // Render professionals grid
+        function renderProfessionals() {
+            const container = document.getElementById('professionalsGrid');
+            professionals.forEach(pro => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${pro.image}" alt="${pro.name}">
+                    <div class="service-name">${pro.name}</div>
+                    <div class="price">${pro.specialty}</div>
+                `;
+                card.addEventListener('click', () => selectProfessional(pro.id));
+                container.appendChild(card);
+            });
+        }
+
+        // Render days
+        function renderDays() {
+            const container = document.getElementById('scheduleDays');
+            days.forEach(day => {
+                const div = document.createElement('div');
+                div.className = 'day-slot';
+                div.textContent = day;
+                div.addEventListener('click', () => selectDay(day));
+                container.appendChild(div);
+            });
+        }
+
+        // Render time slots based on selected professional
+        function renderTimes() {
+            const container = document.getElementById('scheduleTimes');
+            container.innerHTML = '';
+            
+            // Simulate different availability based on professional
+            const availableTimes = selectedProfessional ? 
+                times.filter((_, i) => selectedProfessional.id !== 4 || i < 5) : times;
+            
+            availableTimes.forEach(time => {
+                const div = document.createElement('div');
+                div.className = 'time-slot';
+                div.textContent = time;
+                div.addEventListener('click', () => selectTime(time));
+                container.appendChild(div);
+            });
+        }
+
+        // Selection functions
+        function selectService(id) {
+            selectedService = services.find(s => s.id === id);
+            updateSelection('servicesGrid', id);
+        }
+
+        function selectProfessional(id) {
+            selectedProfessional = professionals.find(p => p.id === id);
+            updateSelection('professionalsGrid', id);
+            renderTimes();
+        }
+
+        function selectDay(day) {
+            selectedDay = day;
+            updateSelection('scheduleDays', day);
+        }
+
+        function selectTime(time) {
+            selectedTime = time;
+            updateSelection('scheduleTimes', time);
+        }
+
+        function updateSelection(containerId, id) {
+            const container = document.getElementById(containerId);
+            Array.from(container.children).forEach((el, index) => {
+                if (containerId === 'scheduleDays') {
+                    el.classList.toggle('selected', el.textContent === id);
+                } else if (containerId === 'scheduleTimes') {
+                    el.classList.toggle('selected', el.textContent === id);
+                } else {
+                    el.classList.toggle('selected', index === id - 1);
+                }
+            });
+        }
+
+        // Navigation
+        function showStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step${step}`).classList.add('active');
+            currentStep = step;
+            
+            document.getElementById('stepIndicator').textContent = 
+                `Step ${step} of 4: ${getStepTitle(step)}`;
+        }
+
+        function getStepTitle(step) {
+            return ['Select Service', 'Select Professional', 'Schedule Appointment', 'Confirmation'][step - 1];
+        }
+
+        function nextStep() {
+            if (currentStep === 1 && !selectedService) return alert('Please select a service');
+            if (currentStep === 2 && !selectedProfessional) return alert('Please select a professional');
+            if (currentStep === 3 && (!selectedDay || !selectedTime)) return alert('Please select date and time');
+            
+            showStep(currentStep + 1);
+        }
+
+        function prevStep() {
+            showStep(currentStep - 1);
+        }
+
+        function confirmAppointment() {
+            if (!selectedDay || !selectedTime) return alert('Please select date and time');
+            
+            const details = document.getElementById('confirmationDetails');
+            details.innerHTML = `
+                <p>Service: ${selectedService.name}</p>
+                <p>Professional: ${selectedProfessional.name}</p>
+                <p>Date: ${selectedDay}, ${selectedTime}</p>
+                <p>Price: ${selectedService.price}</p>
+            `;
+            showStep(4);
+        }
+
+        function resetApp() {
+            selectedService = null;
+            selectedProfessional = null;
+            selectedDay = null;
+            selectedTime = null;
+            document.querySelectorAll('.card, .day-slot, .time-slot').forEach(el => el.classList.remove('selected'));
+            showStep(1);
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
