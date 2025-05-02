@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beauty Salon Booking</title>
+    
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
     <style>
         :root {
             --primary: #e91e63;
@@ -25,6 +29,7 @@
             min-height: 100vh;
             color: var(--dark);
             padding: 2rem;
+            line-height: 1.6;
         }
 
         .container {
@@ -90,6 +95,7 @@
             height: 150px;
             object-fit: cover;
             margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffe0f0, #f8bbd0);
         }
 
         .service-name {
@@ -104,24 +110,31 @@
             text-align: center;
         }
 
-        .schedule-container {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .day-slot, .time-slot {
-            padding: 0.5rem;
-            border-radius: 10px;
+        .calendar-container {
+            margin-bottom: 1.5rem;
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
         }
 
-        .day-slot.selected, .time-slot.selected {
-            background: var(--primary);
-            color: white;
+        .calendar-label {
+            font-weight: bold;
+            margin-right: 1rem;
+            color: var(--primary);
+        }
+
+        .calendar-input {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            border: 2px solid var(--primary);
+            font-size: 1rem;
+            width: 80%;
+            max-width: 300px;
+            transition: border-color 0.3s;
+        }
+
+        .calendar-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2);
         }
 
         .time-grid {
@@ -129,6 +142,19 @@
             grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
             gap: 0.5rem;
             margin-bottom: 1.5rem;
+        }
+
+        .time-slot {
+            padding: 0.5rem;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .time-slot.selected {
+            background: var(--primary);
+            color: white;
         }
 
         .nav-buttons {
@@ -162,17 +188,28 @@
             color: var(--secondary);
         }
 
+        .confirmation-details {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            margin: 2rem 0;
+        }
+
         @media (max-width: 768px) {
-            .schedule-container {
-                grid-template-columns: repeat(3, 1fr);
+            .calendar-container {
+                margin-bottom: 2rem;
+            }
+            
+            .calendar-input {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="step-indicator" id="stepIndicator">Step 1 of 3: Select Service</div>
+        <div class="step-indicator" id="stepIndicator">Step 1 of 4: Select Service</div>
         
+        <!-- Step 1: Services -->
         <div class="step active" id="step1">
             <h1>Our Services</h1>
             <div class="services-grid" id="servicesGrid"></div>
@@ -181,6 +218,7 @@
             </div>
         </div>
 
+        <!-- Step 2: Professionals -->
         <div class="step" id="step2">
             <h1>Select Professional</h1>
             <div class="professionals-grid" id="professionalsGrid"></div>
@@ -190,9 +228,13 @@
             </div>
         </div>
 
+        <!-- Step 3: Schedule -->
         <div class="step" id="step3">
             <h1>Schedule Appointment</h1>
-            <div class="schedule-container" id="scheduleDays"></div>
+            <div class="calendar-container">
+                <label for="datePicker" class="calendar-label">Select Date:</label>
+                <input type="text" id="datePicker" placeholder="Choose a date" class="calendar-input">
+            </div>
             <div class="time-grid" id="scheduleTimes"></div>
             <div class="nav-buttons">
                 <button class="btn" onclick="prevStep()">Back</button>
@@ -200,14 +242,18 @@
             </div>
         </div>
 
+        <!-- Step 4: Confirmation -->
         <div class="step" id="confirmation">
             <div class="confirmation">
-                <h1>Appointment Confirmed!</h1>
-                <p id="confirmationDetails"></p>
+                <h1>Appointment Confirmed! ✅</h1>
+                <div class="confirmation-details" id="confirmationDetails"></div>
                 <button class="btn" onclick="resetApp()">Book Another</button>
             </div>
         </div>
     </div>
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script>
         // Sample data
@@ -221,26 +267,24 @@
         ];
 
         const professionals = [
-            {id: 1, name: 'Sarah', specialty: 'Hair & Makeup', image: 'https://images.unsplash.com/photo-1531434732625-2b531c26dd7d'},
-            {id: 2, name: 'Maria', specialty: 'Skincare', image: 'https://images.unsplash.com/photo-1559087040-2f3ba8be27bb'},
-            {id: 3, name: 'Lina', specialty: 'Nails', image: 'https://images.unsplash.com/photo-1586023492123-289e9c2265a3'},
-            {id: 4, name: 'Elena', specialty: 'Massage', image: 'https://images.unsplash.com/photo-1591229017515-0b732ca8c575'}
+            {id: 1, name: 'Sarah', specialty: 'Hair & Makeup', image: 'https://images.unsplash.com/photo-1531434732625-2b531c26dd7d?auto=format&fit=crop&w=800&q=80'},
+            {id: 2, name: 'Maria', specialty: 'Skincare', image: 'https://images.unsplash.com/photo-1559087040-2f3ba8be27bb?auto=format&fit=crop&w=800&q=80'},
+            {id: 3, name: 'Lina', specialty: 'Nails', image: 'https://images.unsplash.com/photo-1586023492123-289e9c2265a3?auto=format&fit=crop&w=800&q=80'},
+            {id: 4, name: 'Elena', specialty: 'Massage', image: 'https://images.unsplash.com/photo-1591229017515-0b732ca8c575?auto=format&fit=crop&w=800&q=80'}
         ];
 
-        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         const times = ['9:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
 
         let currentStep = 1;
         let selectedService = null;
         let selectedProfessional = null;
-        let selectedDay = null;
         let selectedTime = null;
+        let selectedDate = null;
 
         // Initialize app
         function init() {
             renderServices();
             renderProfessionals();
-            renderDays();
             showStep(1);
         }
 
@@ -266,7 +310,7 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <img src="${pro.image}" alt="${pro.name}">
+                    <img src="${pro.image}" alt="${pro.name}" onerror="this.src='https://via.placeholder.com/300x150?text=Professional+${pro.id}'; this.onerror=null;">
                     <div class="service-name">${pro.name}</div>
                     <div class="price">${pro.specialty}</div>
                 `;
@@ -275,19 +319,84 @@
             });
         }
 
-        // Render days
-        function renderDays() {
-            const container = document.getElementById('scheduleDays');
-            days.forEach(day => {
-                const div = document.createElement('div');
-                div.className = 'day-slot';
-                div.textContent = day;
-                div.addEventListener('click', () => selectDay(day));
-                container.appendChild(div);
+        // Selection functions
+        function selectService(id) {
+            selectedService = services.find(s => s.id === id);
+            updateSelection('servicesGrid', id);
+        }
+
+        function selectProfessional(id) {
+            selectedProfessional = professionals.find(p => p.id === id);
+            updateSelection('professionalsGrid', id);
+            renderTimes();
+        }
+
+        function selectTime(time) {
+            selectedTime = time;
+            updateSelection('scheduleTimes', time);
+        }
+
+        function updateSelection(containerId, id) {
+            const container = document.getElementById(containerId);
+            Array.from(container.children).forEach((el, index) => {
+                if (containerId === 'scheduleTimes') {
+                    el.classList.toggle('selected', el.textContent === id);
+                } else {
+                    el.classList.toggle('selected', index === id - 1);
+                }
             });
         }
 
-        // Render time slots based on selected professional
+        // Navigation
+        function showStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step${step}`).classList.add('active');
+            currentStep = step;
+            
+            // Initialize calendar on step 3
+            if (step === 3 && !document.querySelector('.flatpickr-calendar')) {
+                initCalendar();
+            }
+
+            document.getElementById('stepIndicator').textContent = 
+                `Step ${step} of 4: ${getStepTitle(step)}`;
+        }
+
+        function getStepTitle(step) {
+            return ['Select Service', 'Select Professional', 'Schedule Appointment', 'Confirmation'][step - 1];
+        }
+
+        function nextStep() {
+            if (currentStep === 1 && !selectedService) return alert('Please select a service');
+            if (currentStep === 2 && !selectedProfessional) return alert('Please select a professional');
+            if (currentStep === 3 && (!selectedDate || !selectedTime)) return alert('Please select date and time');
+            
+            showStep(currentStep + 1);
+        }
+
+        function prevStep() {
+            showStep(currentStep - 1);
+        }
+
+        // Calendar initialization
+        function initCalendar() {
+            flatpickr("#datePicker", {
+                minDate: "today",
+                dateFormat: "Y-m-d",
+                disable: [
+                    function(date) {
+                        // Disable weekends
+                        return (date.getDay() === 0 || date.getDay() === 6);
+                    }
+                ],
+                onChange: function(selectedDates, dateStr) {
+                    selectedDate = dateStr;
+                },
+                theme: "light"
+            });
+        }
+
+        // Render time slots
         function renderTimes() {
             const container = document.getElementById('scheduleTimes');
             container.innerHTML = '';
@@ -305,76 +414,24 @@
             });
         }
 
-        // Selection functions
-        function selectService(id) {
-            selectedService = services.find(s => s.id === id);
-            updateSelection('servicesGrid', id);
-        }
-
-        function selectProfessional(id) {
-            selectedProfessional = professionals.find(p => p.id === id);
-            updateSelection('professionalsGrid', id);
-            renderTimes();
-        }
-
-        function selectDay(day) {
-            selectedDay = day;
-            updateSelection('scheduleDays', day);
-        }
-
-        function selectTime(time) {
-            selectedTime = time;
-            updateSelection('scheduleTimes', time);
-        }
-
-        function updateSelection(containerId, id) {
-            const container = document.getElementById(containerId);
-            Array.from(container.children).forEach((el, index) => {
-                if (containerId === 'scheduleDays') {
-                    el.classList.toggle('selected', el.textContent === id);
-                } else if (containerId === 'scheduleTimes') {
-                    el.classList.toggle('selected', el.textContent === id);
-                } else {
-                    el.classList.toggle('selected', index === id - 1);
-                }
-            });
-        }
-
-        // Navigation
-        function showStep(step) {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById(`step${step}`).classList.add('active');
-            currentStep = step;
-            
-            document.getElementById('stepIndicator').textContent = 
-                `Step ${step} of 4: ${getStepTitle(step)}`;
-        }
-
-        function getStepTitle(step) {
-            return ['Select Service', 'Select Professional', 'Schedule Appointment', 'Confirmation'][step - 1];
-        }
-
-        function nextStep() {
-            if (currentStep === 1 && !selectedService) return alert('Please select a service');
-            if (currentStep === 2 && !selectedProfessional) return alert('Please select a professional');
-            if (currentStep === 3 && (!selectedDay || !selectedTime)) return alert('Please select date and time');
-            
-            showStep(currentStep + 1);
-        }
-
-        function prevStep() {
-            showStep(currentStep - 1);
-        }
-
+        // Confirmation
         function confirmAppointment() {
-            if (!selectedDay || !selectedTime) return alert('Please select date and time');
-            
+            if (!selectedDate || !selectedTime) {
+                alert('Please select both date and time');
+                return;
+            }
+
             const details = document.getElementById('confirmationDetails');
             details.innerHTML = `
-                <p>Service: ${selectedService.name}</p>
-                <p>Professional: ${selectedProfessional.name}</p>
-                <p>Date: ${selectedDay}, ${selectedTime}</p>
-                <p>Price: ${selectedService.price}</p>
+                <h2>Appointment Confirmed! 🎉</h2>
+                <p><strong>Service:</strong> ${selectedService.name}</p>
+                <p><strong>Professional:</strong> ${selectedProfessional.name}</p>
+                <p><strong>Date:</strong> ${selectedDate}</p>
+                <p><strong>Time:</strong> ${selectedTime}</p>
+                <p><strong>Price:</strong> ${selectedService.price}</p>
+                <div style="margin-top: 1.5rem; font-style: italic; color: #666;">
+                    You'll receive a confirmation email shortly.
+                </div>
             `;
             showStep(4);
         }
@@ -382,9 +439,9 @@
         function resetApp() {
             selectedService = null;
             selectedProfessional = null;
-            selectedDay = null;
+            selectedDate = null;
             selectedTime = null;
-            document.querySelectorAll('.card, .day-slot, .time-slot').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('.card, .time-slot').forEach(el => el.classList.remove('selected'));
             showStep(1);
         }
 
