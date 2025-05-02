@@ -6,7 +6,7 @@
     <title>Beauty Salon Booking</title>
     
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <!-- Flatpickr Date Picker -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -31,7 +31,7 @@
             background: var(--light);
             min-height: 100vh;
             color: var(--dark);
-            padding: 2rem 1rem;
+            padding: 1rem;
             line-height: 1.6;
         }
 
@@ -42,7 +42,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             overflow: hidden;
-            padding: 2rem;
+            padding: 1.5rem;
         }
 
         .step {
@@ -59,17 +59,25 @@
             to {opacity: 1; transform: translateY(0);}
         }
 
-        h1, h2 {
-            color: var(--primary);
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.2rem;
+            border-radius: 15px;
             margin-bottom: 1.5rem;
             text-align: center;
         }
 
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
         .services-grid, .professionals-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
         }
 
         .card {
@@ -79,7 +87,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
-            position: relative;
             text-align: center;
         }
 
@@ -98,7 +105,7 @@
             border-radius: 50%;
             height: 100px;
             object-fit: cover;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
             border: 2px solid var(--secondary);
         }
 
@@ -120,8 +127,12 @@
 
         .specialty {
             font-size: 0.85rem;
-            color: var(--primary);
-            margin-top: 0.3rem;
+            color: var(--accent);
+            background: var(--primary);
+            border-radius: 20px;
+            padding: 0.2rem 0.6rem;
+            display: inline-block;
+            margin-top: 0.5rem;
         }
 
         .calendar-container {
@@ -129,14 +140,8 @@
             text-align: center;
         }
 
-        .calendar-label {
-            font-weight: bold;
-            margin-right: 1rem;
-            color: var(--primary);
-        }
-
         .calendar-input {
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1.2rem;
             border-radius: 25px;
             border: 2px solid var(--primary);
             font-size: 1rem;
@@ -154,12 +159,12 @@
         .time-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 0.5rem;
+            gap: 0.6rem;
             margin-bottom: 1.5rem;
         }
 
         .time-slot {
-            padding: 0.5rem;
+            padding: 0.6rem;
             border-radius: 10px;
             text-align: center;
             cursor: pointer;
@@ -174,14 +179,14 @@
         .nav-buttons {
             display: flex;
             justify-content: space-between;
-            margin-top: 1.5rem;
+            margin-top: 1rem;
         }
 
         .btn {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
+            padding: 0.7rem 1.4rem;
             border-radius: 25px;
             cursor: pointer;
             transition: background 0.3s;
@@ -199,7 +204,7 @@
         .confirmation-details {
             line-height: 1.8;
             font-size: 1.1rem;
-            margin: 2rem 0;
+            margin: 1.5rem 0;
         }
 
         .bottom-nav {
@@ -209,7 +214,7 @@
             width: 100%;
             background: white;
             border-top: 1px solid #ddd;
-            padding: 1rem;
+            padding: 0.8rem;
             display: flex;
             justify-content: space-around;
             z-index: 100;
@@ -218,20 +223,26 @@
 
         .nav-icon {
             color: var(--primary);
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             cursor: pointer;
+            transition: color 0.3s;
         }
 
         .nav-icon.active {
             color: var(--secondary);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="header">
+            <h1>Beauty Salon Booking</h1>
+        </div>
+
         <!-- Step 1: Services -->
         <div class="step active" id="step1">
-            <h1>Our Services</h1>
+            <h2>Select Service</h2>
             <div class="services-grid" id="servicesGrid"></div>
             <div class="nav-buttons">
                 <button class="btn" onclick="nextStep()">Next</button>
@@ -240,7 +251,7 @@
 
         <!-- Step 2: Professionals -->
         <div class="step" id="step2">
-            <h1>Select Professional</h1>
+            <h2>Select Professional</h2>
             <div class="professionals-grid" id="professionalsGrid"></div>
             <div class="nav-buttons">
                 <button class="btn" onclick="prevStep()">Back</button>
@@ -250,7 +261,7 @@
 
         <!-- Step 3: Schedule -->
         <div class="step" id="step3">
-            <h1>Schedule Appointment</h1>
+            <h2>Schedule Appointment</h2>
             <div class="calendar-container">
                 <label for="datePicker" class="calendar-label">Select Date:</label>
                 <input type="text" id="datePicker" placeholder="Choose a date" class="calendar-input">
@@ -265,7 +276,7 @@
         <!-- Step 4: Confirmation -->
         <div class="step" id="confirmation">
             <div class="confirmation">
-                <h1>Appointment Confirmed! ✅</h1>
+                <h2>Appointment Confirmed! ✅</h2>
                 <div class="confirmation-details" id="confirmationDetails"></div>
                 <button class="btn" onclick="resetApp()">Book Another</button>
             </div>
@@ -340,7 +351,7 @@
                 card.innerHTML = `
                     <img src="${pro.image}" alt="${pro.name}" onerror="this.src='https://via.placeholder.com/150'; this.onerror=null;">
                     <div class="service-name">${pro.name}</div>
-                    <div class="rating">★ ${pro.rating} <span style="color:#999">(${pro.reviews})</span></div>
+                    <div class="rating">★ ${pro.rating} <span style="color:#ccc">(${pro.reviews})</span></div>
                     <div class="specialty">${pro.specialty}</div>
                 `;
                 card.addEventListener('click', () => selectProfessional(pro.id));
@@ -449,7 +460,7 @@
 
             const details = document.getElementById('confirmationDetails');
             details.innerHTML = `
-                <h2>Appointment Confirmed! 🎉</h2>
+                <h3>Appointment Confirmed! 🎉</h3>
                 <p><strong>Service:</strong> ${selectedService.name}</p>
                 <p><strong>Professional:</strong> ${selectedProfessional.name}</p>
                 <p><strong>Date:</strong> ${selectedDate}</p>
