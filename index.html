@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beauty Salon Booking</title>
     
-    <!-- Flatpickr CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
-            --primary: #e91e63;
-            --secondary: #9c27b0;
-            --light: #f8f9fa;
+            --primary: #2962ff; /* Deep Blue */
+            --secondary: #4fc3f7; /* Light Blue */
+            --light: #f5f5f5;
             --dark: #212121;
-            --accent: #ff4081;
+            --accent: #fff;
         }
 
         * {
@@ -25,7 +25,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, var(--light), var(--primary));
+            background: var(--light);
             min-height: 100vh;
             color: var(--dark);
             padding: 2rem;
@@ -86,7 +86,7 @@
 
         .card.selected {
             border: 2px solid var(--primary);
-            box-shadow: 0 0 0 4px rgba(233, 30, 99, 0.2);
+            box-shadow: 0 0 0 4px rgba(41, 98, 255, 0.2);
         }
 
         .card img {
@@ -95,7 +95,7 @@
             height: 150px;
             object-fit: cover;
             margin-bottom: 1rem;
-            background: linear-gradient(135deg, #ffe0f0, #f8bbd0);
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
         }
 
         .service-name {
@@ -134,7 +134,7 @@
         .calendar-input:focus {
             outline: none;
             border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2);
+            box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.2);
         }
 
         .time-grid {
@@ -194,6 +194,47 @@
             margin: 2rem 0;
         }
 
+        /* New Styles */
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 1rem;
+        }
+
+        .rating {
+            color: gold;
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            border-top: 1px solid #ddd;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+        }
+
+        .nav-icon {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
         @media (max-width: 768px) {
             .calendar-container {
                 margin-bottom: 2rem;
@@ -219,234 +260,4 @@
         </div>
 
         <!-- Step 2: Professionals -->
-        <div class="step" id="step2">
-            <h1>Select Professional</h1>
-            <div class="professionals-grid" id="professionalsGrid"></div>
-            <div class="nav-buttons">
-                <button class="btn" onclick="prevStep()">Back</button>
-                <button class="btn" onclick="nextStep()">Next</button>
-            </div>
-        </div>
-
-        <!-- Step 3: Schedule -->
-        <div class="step" id="step3">
-            <h1>Schedule Appointment</h1>
-            <div class="calendar-container">
-                <label for="datePicker" class="calendar-label">Select Date:</label>
-                <input type="text" id="datePicker" placeholder="Choose a date" class="calendar-input">
-            </div>
-            <div class="time-grid" id="scheduleTimes"></div>
-            <div class="nav-buttons">
-                <button class="btn" onclick="prevStep()">Back</button>
-                <button class="btn" onclick="confirmAppointment()">Confirm</button>
-            </div>
-        </div>
-
-        <!-- Step 4: Confirmation -->
-        <div class="step" id="confirmation">
-            <div class="confirmation">
-                <h1>Appointment Confirmed! ✅</h1>
-                <div class="confirmation-details" id="confirmationDetails"></div>
-                <button class="btn" onclick="resetApp()">Book Another</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Flatpickr JS -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-    <script>
-        // Sample data
-        const services = [
-            {id: 1, name: 'Haircut', price: '$45', duration: '45min'},
-            {id: 2, name: 'Manicure', price: '$30', duration: '30min'},
-            {id: 3, name: 'Facial', price: '$75', duration: '60min'},
-            {id: 4, name: 'Massage', price: '$90', duration: '60min'},
-            {id: 5, name: 'Makeup', price: '$60', duration: '45min'},
-            {id: 6, name: 'Waxing', price: '$25', duration: '30min'}
-        ];
-
-        const professionals = [
-            {id: 1, name: 'Sarah', specialty: 'Hair & Makeup', image: 'https://images.unsplash.com/photo-1531434732625-2b531c26dd7d?auto=format&fit=crop&w=800&q=80'},
-            {id: 2, name: 'Maria', specialty: 'Skincare', image: 'https://images.unsplash.com/photo-1559087040-2f3ba8be27bb?auto=format&fit=crop&w=800&q=80'},
-            {id: 3, name: 'Lina', specialty: 'Nails', image: 'https://images.unsplash.com/photo-1586023492123-289e9c2265a3?auto=format&fit=crop&w=800&q=80'},
-            {id: 4, name: 'Elena', specialty: 'Massage', image: 'https://images.unsplash.com/photo-1591229017515-0b732ca8c575?auto=format&fit=crop&w=800&q=80'}
-        ];
-
-        const times = ['9:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
-
-        let currentStep = 1;
-        let selectedService = null;
-        let selectedProfessional = null;
-        let selectedTime = null;
-        let selectedDate = null;
-
-        // Initialize app
-        function init() {
-            renderServices();
-            renderProfessionals();
-            showStep(1);
-        }
-
-        // Render services grid
-        function renderServices() {
-            const container = document.getElementById('servicesGrid');
-            services.forEach(service => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div class="service-name">${service.name}</div>
-                    <div class="price">${service.price}</div>
-                `;
-                card.addEventListener('click', () => selectService(service.id));
-                container.appendChild(card);
-            });
-        }
-
-        // Render professionals grid
-        function renderProfessionals() {
-            const container = document.getElementById('professionalsGrid');
-            professionals.forEach(pro => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <img src="${pro.image}" alt="${pro.name}" onerror="this.src='https://via.placeholder.com/300x150?text=Professional+${pro.id}'; this.onerror=null;">
-                    <div class="service-name">${pro.name}</div>
-                    <div class="price">${pro.specialty}</div>
-                `;
-                card.addEventListener('click', () => selectProfessional(pro.id));
-                container.appendChild(card);
-            });
-        }
-
-        // Selection functions
-        function selectService(id) {
-            selectedService = services.find(s => s.id === id);
-            updateSelection('servicesGrid', id);
-        }
-
-        function selectProfessional(id) {
-            selectedProfessional = professionals.find(p => p.id === id);
-            updateSelection('professionalsGrid', id);
-            renderTimes();
-        }
-
-        function selectTime(time) {
-            selectedTime = time;
-            updateSelection('scheduleTimes', time);
-        }
-
-        function updateSelection(containerId, id) {
-            const container = document.getElementById(containerId);
-            Array.from(container.children).forEach((el, index) => {
-                if (containerId === 'scheduleTimes') {
-                    el.classList.toggle('selected', el.textContent === id);
-                } else {
-                    el.classList.toggle('selected', index === id - 1);
-                }
-            });
-        }
-
-        // Navigation
-        function showStep(step) {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById(`step${step}`).classList.add('active');
-            currentStep = step;
-            
-            // Initialize calendar on step 3
-            if (step === 3 && !document.querySelector('.flatpickr-calendar')) {
-                initCalendar();
-            }
-
-            document.getElementById('stepIndicator').textContent = 
-                `Step ${step} of 4: ${getStepTitle(step)}`;
-        }
-
-        function getStepTitle(step) {
-            return ['Select Service', 'Select Professional', 'Schedule Appointment', 'Confirmation'][step - 1];
-        }
-
-        function nextStep() {
-            if (currentStep === 1 && !selectedService) return alert('Please select a service');
-            if (currentStep === 2 && !selectedProfessional) return alert('Please select a professional');
-            if (currentStep === 3 && (!selectedDate || !selectedTime)) return alert('Please select date and time');
-            
-            showStep(currentStep + 1);
-        }
-
-        function prevStep() {
-            showStep(currentStep - 1);
-        }
-
-        // Calendar initialization
-        function initCalendar() {
-            flatpickr("#datePicker", {
-                minDate: "today",
-                dateFormat: "Y-m-d",
-                disable: [
-                    function(date) {
-                        // Disable weekends
-                        return (date.getDay() === 0 || date.getDay() === 6);
-                    }
-                ],
-                onChange: function(selectedDates, dateStr) {
-                    selectedDate = dateStr;
-                },
-                theme: "light"
-            });
-        }
-
-        // Render time slots
-        function renderTimes() {
-            const container = document.getElementById('scheduleTimes');
-            container.innerHTML = '';
-            
-            // Simulate different availability based on professional
-            const availableTimes = selectedProfessional ? 
-                times.filter((_, i) => selectedProfessional.id !== 4 || i < 5) : times;
-            
-            availableTimes.forEach(time => {
-                const div = document.createElement('div');
-                div.className = 'time-slot';
-                div.textContent = time;
-                div.addEventListener('click', () => selectTime(time));
-                container.appendChild(div);
-            });
-        }
-
-        // Confirmation
-        function confirmAppointment() {
-            if (!selectedDate || !selectedTime) {
-                alert('Please select both date and time');
-                return;
-            }
-
-            const details = document.getElementById('confirmationDetails');
-            details.innerHTML = `
-                <h2>Appointment Confirmed! 🎉</h2>
-                <p><strong>Service:</strong> ${selectedService.name}</p>
-                <p><strong>Professional:</strong> ${selectedProfessional.name}</p>
-                <p><strong>Date:</strong> ${selectedDate}</p>
-                <p><strong>Time:</strong> ${selectedTime}</p>
-                <p><strong>Price:</strong> ${selectedService.price}</p>
-                <div style="margin-top: 1.5rem; font-style: italic; color: #666;">
-                    You'll receive a confirmation email shortly.
-                </div>
-            `;
-            showStep(4);
-        }
-
-        function resetApp() {
-            selectedService = null;
-            selectedProfessional = null;
-            selectedDate = null;
-            selectedTime = null;
-            document.querySelectorAll('.card, .time-slot').forEach(el => el.classList.remove('selected'));
-            showStep(1);
-        }
-
-        // Initialize on load
-        init();
-    </script>
-</body>
-</html>
+        <div class
