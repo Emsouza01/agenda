@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento - Salão Beleza</title>
+    <style>
+        :root {
+            --salon-pink: #f8c4d8;
+            --salon-lavender: #d8c4f8;
+            --salon-rose: #e75480;
+            --salon-mauve: #9370db;
+            --salon-dark: #5a3e63;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--salon-rose);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--salon-dark);
+            font-weight: 500;
+        }
+
+        select, input[type="datetime-local"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            color: white;
+            background-color: var(--salon-rose);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: var(--salon-mauve);
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 1rem;
+            text-align: center;
+            color: var(--salon-dark);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Agendamento de Serviço</h2>
+        <form id="agendamento-form">
+            <div class="form-group">
+                <label for="servico">Selecione o Serviço:</label>
+                <select id="servico" name="servico" required>
+                    <option value="">Selecione...</option>
+                    <option value="corte-feminino">Corte Feminino (R$ 60,00 - 40 min)</option>
+                    <option value="escova-modeladora">Escova Modeladora (R$ 50,00 - 45 min)</option>
+                    </select>
+            </div>
+            <div class="form-group">
+                <label for="profissional">Selecione o Profissional:</label>
+                <select id="profissional" name="profissional" required>
+                    <option value="">Selecione...</option>
+                    <option value="mariana-silva">Mariana Silva (Especialista em coloração e mechas)</option>
+                    <option value="carla-mendes">Carla Mendes (Expert em cortes modernos e penteados)</option>
+                    </select>
+            </div>
+            <div class="form-group">
+                <label for="horario">Selecione a Data e Horário:</label>
+                <input type="datetime-local" id="horario" name="horario" required>
+            </div>
+            <button type="submit" class="btn">Agendar</button>
+        </form>
+        <a href="index.html" class="back-link">Voltar para a página principal</a>
+    </div>
+
+    <script>
+        document.getElementById('agendamento-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const servico = document.getElementById('servico').value;
+            const profissional = document.getElementById('profissional').value;
+            const horario = document.getElementById('horario').value;
+
+            // Aqui você pode adicionar a lógica para enviar os dados do agendamento
+            // para um servidor ou exibir uma mensagem de confirmação.
+            alert(`Agendamento realizado com sucesso!\nServiço: ${servico}\nProfissional: ${profissional}\nHorário: ${horario}`);
+
+            // Opcional: Redirecionar para uma página de confirmação
+            // window.location.href = 'confirmacao.html';
+        });
+    </script>
+</body>
+</html>
